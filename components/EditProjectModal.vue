@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot appear :show="selectedProject !== null" as="template">
+  <TransitionRoot appear :show="selectedProject !== null && !isDeleteProject" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-10">
       <TransitionChild
           as="template"
@@ -129,13 +129,14 @@
 
 <script setup>
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot,} from '@headlessui/vue'
-import {useModalOpen, useProjects, useSelectedMenu, useSelectedProject} from "~/composables/states";
+import {useDeleteProject, useModalOpen, useProjects, useSelectedMenu, useSelectedProject} from "~/composables/states";
 
 const runtimeConfig = useRuntimeConfig()
 const projects = useProjects()
 const isOpen = useModalOpen()
 const selectedMenu = useSelectedMenu()
 const selectedProject = useSelectedProject()
+const isDeleteProject = useDeleteProject()
 
 function closeModal() {
   selectedProject.value = null
