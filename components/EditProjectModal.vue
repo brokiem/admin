@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot appear :show="isOpen && selectedMenu === 'Projects'" as="template">
+  <TransitionRoot appear :show="selectedProject !== null" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-10">
       <TransitionChild
           as="template"
@@ -28,7 +28,7 @@
           >
             <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                Add Data
+                Update Project
               </DialogTitle>
               <div class="mt-4">
                 <div>
@@ -41,7 +41,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="name" id="name" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="name" id="name" :value="selectedProject?.name" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -54,7 +54,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="desc" id="desc" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="desc" id="desc" :value="selectedProject?.desc" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -67,7 +67,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="stack" id="stack" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="stack" id="stack" :value="selectedProject?.stack" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -80,7 +80,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="url" id="url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="url" id="url" :value="selectedProject?.url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -93,7 +93,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="github" id="github" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="github" id="github" :value="selectedProject?.github" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -106,14 +106,14 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="imgUrl" id="imgUrl" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="imgUrl" id="imgUrl" :value="selectedProject?.img" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
               </div>
 
               <div class="mt-4">
                 <button @click="submitData" type="button" class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                  Add Data
+                  Update Project
                 </button>
                 <button @click="closeModal" type="button" class="mx-2 inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                   Cancel
@@ -128,25 +128,18 @@
 </template>
 
 <script setup>
-import {
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-} from '@headlessui/vue'
-import {useModalOpen, useProjects, useSelectedMenu} from "~/composables/states";
+import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot,} from '@headlessui/vue'
+import {useModalOpen, useProjects, useSelectedMenu, useSelectedProject} from "~/composables/states";
 
 const runtimeConfig = useRuntimeConfig()
 const projects = useProjects()
 const isOpen = useModalOpen()
 const selectedMenu = useSelectedMenu()
+const selectedProject = useSelectedProject()
 
 function closeModal() {
+  selectedProject.value = null
   isOpen.value = false
-}
-function openModal() {
-  isOpen.value = true
 }
 
 function submitData() {
@@ -157,16 +150,18 @@ function submitData() {
   const github = document.getElementById('github').value
   const imgUrl = document.getElementById('imgUrl').value
 
-  const newProject = {
+  const index = projects.value.findIndex((obj => obj.name.toLowerCase() === selectedProject.value.name.toLowerCase()));
+
+  if (index === -1) return closeModal()
+
+  projects.value[index] = {
     desc: desc,
     stack: stack,
     url: url,
     github: github,
     img: imgUrl,
     name: name
-  }
-
-  projects.value.unshift(newProject)
+  };
 
   $fetch(`${runtimeConfig.apiBase}/kv/projects`, {
     method: 'PUT',
