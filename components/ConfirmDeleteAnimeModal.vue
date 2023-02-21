@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot as="template" :show="isDeleteProject">
+  <TransitionRoot as="template" :show="isDeleteAnime">
     <Dialog as="div" class="relative z-10" @close="closeModal">
       <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
@@ -17,15 +17,15 @@
                     </svg>
                   </div>
                   <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Delete Project</DialogTitle>
+                    <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">Delete Anime</DialogTitle>
                     <div class="mt-2">
-                      <p class="text-sm text-gray-500">Are you sure you want to delete this project? This action cannot be undone.</p>
+                      <p class="text-sm text-gray-500">Are you sure you want to delete this Anime? This action cannot be undone.</p>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm" @click="deleteProject">Delete</button>
+                <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm" @click="deleteAnime">Delete</button>
                 <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="closeModal" ref="cancelButtonRef">Cancel</button>
               </div>
             </DialogPanel>
@@ -38,34 +38,34 @@
 
 <script setup>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import {useDeleteProject} from "~/composables/states";
+import {useAnime, useDeleteAnime, useSelectedAnime} from "~/composables/states";
 
 const runtimeConfig = useRuntimeConfig()
 
-const isDeleteProject = useDeleteProject()
-const selectedProject = useSelectedProject()
-const projects = useProjects()
+const isDeleteAnime = useDeleteAnime()
+const selectedAnime = useSelectedAnime()
+const anime = useAnime()
 
 function closeModal() {
-  selectedProject.value = null;
-  isDeleteProject.value = false;
+  selectedAnime.value = null;
+  isDeleteAnime.value = false;
 }
 
-function deleteProject() {
-  const projectIndexToRemove = projects.value.findIndex((project) => {
-    return project.name === selectedProject.value.name;
+function deleteAnime() {
+  const animeIndexToRemove = anime.value.findIndex((anime) => {
+    return anime.title === selectedAnime.value.title;
   });
 
-  if (projectIndexToRemove !== -1) {
-    projects.value.splice(projectIndexToRemove, 1);
+  if (animeIndexToRemove !== -1) {
+    anime.value.splice(animeIndexToRemove, 1);
   }
 
-  $fetch(`${runtimeConfig.apiBase}/kv/projects`, {
+  $fetch(`${runtimeConfig.apiBase}/kv/fav_anime`, {
     method: 'PUT',
     headers: {
       Authorization: localStorage.getItem("apiSecret")
     },
-    body: JSON.stringify(projects.value)
+    body: JSON.stringify(anime.value)
   });
 
   closeModal()

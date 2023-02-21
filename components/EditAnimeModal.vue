@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot appear :show="isOpen && selectedMenu === 'Anime'" as="template">
+  <TransitionRoot appear :show="selectedAnime !== null && !isDeleteAnime" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-10">
       <TransitionChild
           as="template"
@@ -28,7 +28,7 @@
           >
             <DialogPanel class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                Add Data
+                Update Anime
               </DialogTitle>
               <div class="mt-4">
                 <div>
@@ -41,7 +41,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="title" id="title" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="title" id="title" :value="selectedAnime?.title" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -54,7 +54,7 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="banner_url" id="banner_url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="banner_url" id="banner_url" :value="selectedAnime?.cover_url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
                 <div class="mt-2">
@@ -67,14 +67,14 @@
                         </svg>
                       </span>
                     </div>
-                    <input type="text" name="url" id="url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
+                    <input type="text" name="url" id="url" :value="selectedAnime?.url" class="block w-full rounded-md border border-gray-300 h-9 px-7 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"/>
                   </div>
                 </div>
               </div>
 
               <div class="mt-4">
                 <button @click="submitData" type="button" class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                  Add Data
+                  Update Anime
                 </button>
                 <button @click="closeModal" type="button" class="mx-2 inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                   Cancel
@@ -89,25 +89,19 @@
 </template>
 
 <script setup>
-import {
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-} from '@headlessui/vue'
-import {useAnime, useModalOpen, useSelectedMenu} from "~/composables/states";
+import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot,} from '@headlessui/vue'
+import {useAnime, useDeleteAnime, useModalOpen, useSelectedMenu} from "~/composables/states";
 
 const runtimeConfig = useRuntimeConfig()
 const anime = useAnime()
 const isOpen = useModalOpen()
 const selectedMenu = useSelectedMenu()
+const selectedAnime = useSelectedAnime()
+const isDeleteAnime = useDeleteAnime()
 
 function closeModal() {
+  selectedAnime.value = null
   isOpen.value = false
-}
-function openModal() {
-  isOpen.value = true
 }
 
 function submitData() {
@@ -115,13 +109,15 @@ function submitData() {
   const bannerUrl = document.getElementById('banner_url').value
   const url = document.getElementById('url').value
 
-  const newAnime = {
+  const index = anime.value.findIndex((obj => obj.title.toLowerCase() === selectedAnime.value.title.toLowerCase()));
+
+  if (index === -1) return closeModal()
+
+  anime.value[index] = {
     title: title,
     cover_url: bannerUrl,
     url: url
   }
-
-  anime.value.unshift(newAnime)
 
   $fetch(`${runtimeConfig.apiBase}/kv/fav_anime`, {
     method: 'PUT',
