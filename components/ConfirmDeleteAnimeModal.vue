@@ -53,6 +53,8 @@ function closeModal() {
 }
 
 function deleteAnime() {
+  const cache = JSON.parse(JSON.stringify(anime.value));
+
   const animeIndexToRemove = anime.value.findIndex((anime) => {
     return anime.title === selectedAnime.value.title;
   });
@@ -61,7 +63,11 @@ function deleteAnime() {
     anime.value.splice(animeIndexToRemove, 1);
   }
 
-  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"));
+  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"))
+      .catch((err) => {
+        anime.value = cache;
+        console.error(err);
+      });
 
   closeModal()
 }

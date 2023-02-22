@@ -53,6 +53,8 @@ function closeModal() {
 }
 
 function deleteProject() {
+  const cache = JSON.parse(JSON.stringify(projects.value));
+
   const projectIndexToRemove = projects.value.findIndex((project) => {
     return project.name === selectedProject.value.name;
   });
@@ -61,7 +63,11 @@ function deleteProject() {
     projects.value.splice(projectIndexToRemove, 1);
   }
 
-  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"));
+  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"))
+      .catch((err) => {
+        projects.value = cache;
+        console.error(err);
+      });
 
   closeModal()
 }

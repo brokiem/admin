@@ -106,6 +106,8 @@ function closeModal() {
 }
 
 function submitData() {
+  const cache = JSON.parse(JSON.stringify(anime.value));
+
   const title = document.getElementById('title').value
   const bannerUrl = document.getElementById('banner_url').value
   const url = document.getElementById('url').value
@@ -120,7 +122,11 @@ function submitData() {
     url: url
   }
 
-  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"));
+  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"))
+      .catch((e) => {
+        anime.value = cache
+        console.error(e)
+      });
 
   closeModal()
 }

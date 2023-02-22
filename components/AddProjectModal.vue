@@ -151,6 +151,8 @@ function openModal() {
 }
 
 function submitData() {
+  const cache = JSON.parse(JSON.stringify(projects.value))
+
   const name = document.getElementById('name').value
   const desc = document.getElementById('desc').value
   const stack = document.getElementById('stack').value
@@ -169,7 +171,11 @@ function submitData() {
 
   projects.value.unshift(newProject)
 
-  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"));
+  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"))
+      .catch((err) => {
+        projects.value = cache
+        console.log(err)
+      })
 
   closeModal()
 }

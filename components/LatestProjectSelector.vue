@@ -54,14 +54,22 @@ function searchProject(title) {
   })[0];
 }
 
-let name = useState('name', () => latestProject.value.name)
+const name = useState('name', () => latestProject.value.name)
 const selected = useState('selected', () => searchProject(name.value))
 
 watch(name, (newTitle) => {
+  const cache = JSON.parse(JSON.stringify(selected.value))
+
   const newSelected = searchProject(newTitle)
   selected.value = newSelected
   latestProject.value = newSelected
 
-  setKV(runtimeConfig.userId, 'latest_project', latestProject.value, localStorage.getItem("apiSecret"));
+  setKV(runtimeConfig.userId, 'latest_project', latestProject.value, localStorage.getItem("apiSecret"))
+      .catch((e) => {
+        name.value = cache.name
+        selected.value = cache
+        latestProject.value = cache
+        console.error(e)
+      })
 })
 </script>
