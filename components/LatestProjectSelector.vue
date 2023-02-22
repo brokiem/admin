@@ -42,6 +42,7 @@
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import {useLatestProject, useProjects} from "~/composables/states";
 import {useState} from "#app";
+import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig();
 const projects = useProjects();
@@ -61,12 +62,6 @@ watch(name, (newTitle) => {
   selected.value = newSelected
   latestProject.value = newSelected
 
-  $fetch(`${runtimeConfig.apiBase}/kv/latest_project`, {
-    method: 'PUT',
-    headers: {
-      Authorization: localStorage.getItem("apiSecret")
-    },
-    body: latestProject.value
-  });
+  setKV(runtimeConfig.userId, 'latest_project', latestProject.value, localStorage.getItem("apiSecret"));
 })
 </script>

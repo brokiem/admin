@@ -2983,10 +2983,10 @@ koa@^2.12.0:
     type-is "^1.6.16"
     vary "^1.1.2"
 
-lanyard-wrapper@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/lanyard-wrapper/-/lanyard-wrapper-1.0.3.tgz#c3ed27418db7a63a73fc9bcdcc2228d09094db25"
-  integrity sha512-D6tBjhP6bleRiCIQD57Hs3zDPZ2ODsjZCKNfVmYZlIaAUNVNAvxBeDpsc+jwuMnkghWVposJDP4I/b6KG72xpg==
+lanyard-wrapper@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/lanyard-wrapper/-/lanyard-wrapper-2.0.0.tgz#28f027a9695277e0a9049a006b4d0394f49e68db"
+  integrity sha512-+9pco7KvfnCqyU4QepMUd7HqVzNjgTWb96QdXmtZ43O+UQIRVWFVPGf53RBGpryGul8mcmk2Ow7HAj9RfUrjPg==
 
 lazystream@^1.0.0:
   version "1.0.1"

@@ -91,6 +91,7 @@
 <script setup>
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot,} from '@headlessui/vue'
 import {useAnime, useDeleteAnime, useModalOpen, useSelectedMenu} from "~/composables/states";
+import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig()
 const anime = useAnime()
@@ -119,13 +120,7 @@ function submitData() {
     url: url
   }
 
-  $fetch(`${runtimeConfig.apiBase}/kv/fav_anime`, {
-    method: 'PUT',
-    headers: {
-      Authorization: localStorage.getItem("apiSecret")
-    },
-    body: JSON.stringify(anime.value)
-  });
+  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"));
 
   closeModal()
 }

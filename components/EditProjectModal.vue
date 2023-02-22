@@ -130,6 +130,7 @@
 <script setup>
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot,} from '@headlessui/vue'
 import {useDeleteProject, useModalOpen, useProjects, useSelectedMenu, useSelectedProject} from "~/composables/states";
+import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig()
 const projects = useProjects()
@@ -164,13 +165,7 @@ function submitData() {
     name: name
   };
 
-  $fetch(`${runtimeConfig.apiBase}/kv/projects`, {
-    method: 'PUT',
-    headers: {
-      Authorization: localStorage.getItem("apiSecret")
-    },
-    body: JSON.stringify(projects.value)
-  });
+  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"));
 
   closeModal()
 }

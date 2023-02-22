@@ -39,6 +39,7 @@
 <script setup>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import {useDeleteProject} from "~/composables/states";
+import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -60,13 +61,7 @@ function deleteProject() {
     projects.value.splice(projectIndexToRemove, 1);
   }
 
-  $fetch(`${runtimeConfig.apiBase}/kv/projects`, {
-    method: 'PUT',
-    headers: {
-      Authorization: localStorage.getItem("apiSecret")
-    },
-    body: JSON.stringify(projects.value)
-  });
+  setKV(runtimeConfig.userId, "projects", projects.value, localStorage.getItem("apiSecret"));
 
   closeModal()
 }

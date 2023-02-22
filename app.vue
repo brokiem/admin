@@ -107,7 +107,7 @@ if (process.client) {
     projects.value = JSON.parse(data.kv.projects);
     latestProject.value = JSON.parse(data.kv.latest_project);
     anime.value = JSON.parse(data.kv.fav_anime);
-  }, () => {
+  }).catch(() => {
     refresh();
     showRefreshButton = true;
   });

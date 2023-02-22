@@ -39,6 +39,7 @@
 <script setup>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import {useAnime, useDeleteAnime, useSelectedAnime} from "~/composables/states";
+import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -60,13 +61,7 @@ function deleteAnime() {
     anime.value.splice(animeIndexToRemove, 1);
   }
 
-  $fetch(`${runtimeConfig.apiBase}/kv/fav_anime`, {
-    method: 'PUT',
-    headers: {
-      Authorization: localStorage.getItem("apiSecret")
-    },
-    body: JSON.stringify(anime.value)
-  });
+  setKV(runtimeConfig.userId, "fav_anime", anime.value, localStorage.getItem("apiSecret"));
 
   closeModal()
 }

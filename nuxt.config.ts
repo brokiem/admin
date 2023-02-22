@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
     runtimeConfig: {
         public: {
-            apiBase: 'https://api.lanyard.rest/v1/users/548120702373593090',
+            userId: "548120702373593090"
         }
     },
     modules: [
