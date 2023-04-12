@@ -28,11 +28,11 @@
                   <button @click="selectMenu('Projects')" type="button" class="inline-flex items-center rounded-md border border-indigo-600 px-4 py-2 w-52 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-700 hover:text-white focus:bg-indigo-600 focus:text-white focus:outline-none focus:ring-0 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300" :class="selectedMenu === 'Projects' ? ['!bg-indigo-600', '!text-white'] : ''">
                     Projects
                   </button>
-                  <button @click="selectMenu('Latest Project')" type="button" class="inline-flex items-center rounded-md border border-indigo-600 px-4 py-2 w-52 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-700 hover:text-white focus:bg-indigo-600 focus:text-white focus:outline-none focus:ring-0 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300" :class="selectedMenu === 'Latest Project' ? ['!bg-indigo-600', '!text-white'] : ''">
-                    Latest Project
-                  </button>
                   <button @click="selectMenu('Anime')" type="button" class="inline-flex items-center rounded-md border border-indigo-600 px-4 py-2 w-52 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-700 hover:text-white focus:bg-indigo-600 focus:text-white focus:outline-none focus:ring-0 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300" :class="selectedMenu === 'Anime' ? ['!bg-indigo-600', '!text-white'] : ''">
                     Anime
+                  </button>
+                  <button @click="selectMenu('Settings')" type="button" class="inline-flex items-center rounded-md border border-indigo-600 px-4 py-2 w-52 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-700 hover:text-white focus:bg-indigo-600 focus:text-white focus:outline-none focus:ring-0 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300" :class="selectedMenu === 'Settings' ? ['!bg-indigo-600', '!text-white'] : ''">
+                    Settings
                   </button>
                 </div>
 
@@ -41,7 +41,7 @@
                     <div class="text-left text-2xl font-bold rounded-md">
                       {{selectedMenu}}
                     </div>
-                    <button v-if="selectedMenu !== 'Latest Project'" @click="openModal" type="button" class="items-center rounded-md bg-indigo-600 text-white border border-indigo-600 px-4 py-2 text-sm font-medium shadow-sm hover:bg-indigo-700 hover:text-white focus:outline-none focus:ring-indigo-500 focus:ring-0 focus:ring-offset-2 transition duration-300">
+                    <button v-if="selectedMenu !== 'Settings'" @click="openModal" type="button" class="items-center rounded-md bg-indigo-600 text-white border border-indigo-600 px-4 py-2 text-sm font-medium shadow-sm hover:bg-indigo-700 hover:text-white focus:outline-none focus:ring-indigo-500 focus:ring-0 focus:ring-offset-2 transition duration-300">
                       Add Data
                     </button>
                   </div>
@@ -49,7 +49,7 @@
                   <!-- component -->
                   <ProjectsTable v-if="selectedMenu === 'Projects'" />
                   <AnimeTable v-if="selectedMenu === 'Anime'" />
-                  <LatestProjectSelector v-if="selectedMenu === 'Latest Project'" />
+                  <LatestProjectSelector v-if="selectedMenu === 'Settings'" />
                 </div>
               </div>
             </div>
@@ -73,7 +73,8 @@ import {
   useModalOpen,
   useProjects,
   useSelectedMenu,
-  useSetSecret
+  useSetSecret,
+  useSettings
 } from "~/composables/states";
 import AddAnimeModal from "~/components/AddAnimeModal.vue";
 import LatestProjectSelector from "~/components/LatestProjectSelector.vue";
@@ -85,6 +86,11 @@ const latestProject = useLatestProject()
 const anime = useAnime()
 const modalOpen = useModalOpen()
 const setSecretKey = useSetSecret()
+const settings = useSettings()
+
+settings.value = {
+  useDiscordProfile: false
+}
 
 let showRefreshButton = false;
 
@@ -94,6 +100,7 @@ const refresh = () => {
       projects.value = JSON.parse(data.kv.projects);
       latestProject.value = JSON.parse(data.kv.latest_project);
       anime.value = JSON.parse(data.kv.fav_anime);
+      settings.value.useDiscordProfile = data.kv.use_discord_profile === "true";
     });
   }
 }
@@ -107,6 +114,7 @@ if (process.client) {
     projects.value = JSON.parse(data.kv.projects);
     latestProject.value = JSON.parse(data.kv.latest_project);
     anime.value = JSON.parse(data.kv.fav_anime);
+    settings.value.useDiscordProfile = data.kv.use_discord_profile === "true";
   }).catch(() => {
     refresh();
     showRefreshButton = true;

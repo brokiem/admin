@@ -1,7 +1,7 @@
 <template>
   <div class="mt-3">
     <Listbox as="div" v-model="name">
-      <ListboxLabel class="block text-sm font-medium text-gray-700">Assigned to</ListboxLabel>
+      <ListboxLabel class="block text-sm font-medium text-gray-700">Latest Project assigned to</ListboxLabel>
       <div class="relative mt-1">
         <ListboxButton class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
           <span class="flex items-center">
@@ -36,17 +36,36 @@
       </div>
     </Listbox>
   </div>
+
+  <div class="mt-2">
+    <p class="block text-sm font-medium text-gray-700">Use Discord profile picture</p>
+    <div>
+      <Switch
+          v-model="useDiscordProfile"
+          :class="useDiscordProfile ? 'bg-teal-900' : 'bg-teal-700'"
+          class="relative inline-flex h-[20px] w-[74px] shrink-0 cursor-pointer rounded-lg border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+      >
+        <span class="sr-only">Use setting</span>
+        <span
+            aria-hidden="true"
+            :class="useDiscordProfile ? 'translate-x-9' : 'translate-x-0'"
+            class="pointer-events-none inline-block h-[16px] w-[34px] transform rounded-md bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+        />
+      </Switch>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
-import {useLatestProject, useProjects} from "~/composables/states";
+import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions, Switch } from '@headlessui/vue'
+import {useLatestProject, useProjects, useSettings} from "~/composables/states";
 import {useState} from "#app";
 import {setKV} from "lanyard-wrapper";
 
 const runtimeConfig = useRuntimeConfig();
 const projects = useProjects();
 const latestProject = useLatestProject()
+const settings = useSettings()
 
 function searchProject(title) {
   return projects.value.filter((project) => {
@@ -69,6 +88,15 @@ watch(name, (newTitle) => {
         name.value = cache.name
         selected.value = cache
         latestProject.value = cache
+        console.error(e)
+      })
+})
+
+const useDiscordProfile = useState('useDiscordProfile', () => settings.value.useDiscordProfile)
+
+watch(useDiscordProfile, (value) => {
+  setKV(runtimeConfig.userId, 'use_discord_profile', value, localStorage.getItem("apiSecret"))
+      .catch((e) => {
         console.error(e)
       })
 })
