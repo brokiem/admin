@@ -11,7 +11,7 @@
     "nuxt": "^3.8.0"
   },
   "dependencies": {
-    "@nuxtjs/tailwindcss": "^6.8.1",
+    "@nuxtjs/tailwindcss": "^6.9.4",
     "lanyard-wrapper": "^2.0.1",
     "nuxt-headlessui": "^1.1.4"
   },
